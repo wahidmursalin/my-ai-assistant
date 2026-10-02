@@ -77,7 +77,7 @@ export default function Chat() {
       });
       setConversationId(data.conversationId);
       setMessages((prev) => [...prev, { role: "assistant", content: data.reply }]);
-      if (data.memorySaved) setNotice("🧠 Saved that to memory.");
+      if (data.memorySaved) setNotice(" Saved that to memory.");
       else if (data.toolsUsed?.length) setNotice(`🔧 Used: ${data.toolsUsed.join(", ")}`);
       else if (data.usedKnowledge) setNotice("📄 Used your uploaded documents to answer.");
 

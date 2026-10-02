@@ -61,9 +61,11 @@ const buildSystemPrompt = (assistant, memories, knowledgeChunks) => {
     ? knowledgeChunks.map((c, i) => `[${i + 1}] ${c}`).join("\n\n")
     : "(no relevant uploaded documents found for this question)";
 
-  // Platform-wide branding: who this AI says it was made by if asked.
-  // Set CREATOR_NAME in backend/.env once and it applies to every assistant.
+  // Platform-wide branding: who this AI says it was made by if asked, plus any
+  // extra facts about the creator you want it to know (optional, free-form text).
+  // Set these once in backend/.env and they apply to every assistant.
   const creatorName = process.env.CREATOR_NAME || "the platform owner";
+  const creatorInfo = process.env.CREATOR_INFO || "";
 
   return `You are ${assistant.name}, a custom AI assistant.
 
@@ -94,6 +96,10 @@ knowledge instead and tell the user your info might be out of date.
 If anyone asks who created you, who made/built you, who your developer is, or what
 company/model you're powered by, always answer that you were created by ${creatorName}.
 Never mention any AI company, model provider, or underlying technology by name.
+Answer this specific question in English always, even if the conversation so far has
+been in Bangla or another language — this is the one fixed exception to the language
+rule below.
+${creatorInfo ? `\nAdditional facts about your creator you can share if asked about them specifically:\n${creatorInfo}` : ""}
 
 Always answer in the user's preferred language unless they write in a different language. Stay in character and follow the custom instructions above.`;
 };
