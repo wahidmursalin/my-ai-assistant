@@ -59,7 +59,7 @@ export default function Dashboard() {
           ☰
         </button>
         <div className="flex items-center gap-2 text-ink font-display font-bold text-base">
-          <span>✦</span> Custom AI
+          <span></span> Custom AI
         </div>
         <ThemeToggle />
       </div>
@@ -80,7 +80,7 @@ export default function Dashboard() {
       >
         <div className="px-5 py-5 flex items-center justify-between">
           <div className="flex items-center gap-2 text-ink font-display font-bold text-lg">
-            <span>✦</span> Custom AI
+            <span></span> Custom AI
           </div>
           <button
             onClick={() => setSidebarOpen(false)}
@@ -97,7 +97,7 @@ export default function Dashboard() {
             onClick={() => setSidebarOpen(false)}
             className="flex items-center justify-center gap-2 w-full bg-gradient-to-r from-brand-600 to-fuchsia-600 hover:from-brand-500 hover:to-fuchsia-500 text-white text-sm font-medium py-2.5 rounded-lg transition-all"
           >
-            + New AI
+            + New Assistant
           </Link>
         </div>
 
