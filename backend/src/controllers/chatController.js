@@ -5,7 +5,7 @@ import Message from "../models/Message.js";
 import Chunk from "../models/Chunk.js";
 import { runAgent, analyzeImage } from "../utils/llm.js";
 import { embedQuery, cosineSimilarity } from "../utils/embeddings.js";
-import fs from "fs";
+import { uploadBuffer } from "../utils/cloudinary.js";
 
 // Very simple heuristic memory detector.
 // If the user explicitly says "remember ...", "always ...", "I prefer ...",
@@ -228,9 +228,12 @@ export const sendImageMessage = async (req, res) => {
       content: m.imageUrl ? `${m.content} [sent an image]` : m.content,
     }));
 
-    const imageBuffer = fs.readFileSync(req.file.path);
-    const imageBase64 = imageBuffer.toString("base64");
-    const publicImageUrl = `/uploads/${req.file.filename}`;
+    const imageBase64 = req.file.buffer.toString("base64");
+
+    // Upload to Cloudinary so the image persists across redeploys/restarts
+    // (no local disk involved) and so the URL works for a separately-hosted frontend.
+    const cloudResult = await uploadBuffer(req.file.buffer, { folder: "chat-images", resourceType: "image" });
+    const publicImageUrl = cloudResult.secure_url;
 
     await Message.create({
       conversationId: conversation._id,

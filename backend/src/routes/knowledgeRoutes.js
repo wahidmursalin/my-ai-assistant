@@ -1,19 +1,12 @@
 import express from "express";
 import multer from "multer";
-import path from "path";
 import { protect } from "../middleware/auth.js";
 import { uploadKnowledge, getKnowledgeFiles, deleteKnowledgeFile } from "../controllers/knowledgeController.js";
 
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, "src/uploads"),
-  filename: (req, file, cb) => {
-    const unique = `${Date.now()}-${Math.round(Math.random() * 1e9)}`;
-    cb(null, `${unique}${path.extname(file.originalname)}`);
-  },
-});
-
+// Memory storage, not disk — the buffer goes straight to Cloudinary so nothing
+// is ever written to local disk (which platforms like Render wipe on redeploy).
 const upload = multer({
-  storage,
+  storage: multer.memoryStorage(),
   limits: { fileSize: 20 * 1024 * 1024 }, // 20MB
   fileFilter: (req, file, cb) => {
     if (file.mimetype !== "application/pdf") {

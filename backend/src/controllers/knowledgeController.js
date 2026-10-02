@@ -1,10 +1,10 @@
-import fs from "fs";
 import pdfParse from "pdf-parse";
 import Assistant from "../models/Assistant.js";
 import KnowledgeFile from "../models/KnowledgeFile.js";
 import Chunk from "../models/Chunk.js";
 import { chunkText } from "../utils/textProcessor.js";
 import { embedDocuments } from "../utils/embeddings.js";
+import { uploadBuffer, deleteFromCloudinary } from "../utils/cloudinary.js";
 
 export const uploadKnowledge = async (req, res) => {
   try {
@@ -15,11 +15,15 @@ export const uploadKnowledge = async (req, res) => {
     const assistant = await Assistant.findOne({ _id: assistantId, userId: req.userId });
     if (!assistant) return res.status(404).json({ message: "Assistant not found" });
 
+    // Upload the original PDF to Cloudinary so it survives redeploys (no local disk).
+    const cloudResult = await uploadBuffer(req.file.buffer, { folder: "knowledge", resourceType: "raw" });
+
     const knowledgeFile = await KnowledgeFile.create({
       userId: req.userId,
       assistantId,
       fileName: req.file.originalname,
-      fileUrl: req.file.path,
+      fileUrl: cloudResult.secure_url,
+      cloudinaryPublicId: cloudResult.public_id,
       status: "processing",
     });
 
@@ -27,8 +31,7 @@ export const uploadKnowledge = async (req, res) => {
     res.status(202).json(knowledgeFile);
 
     try {
-      const buffer = fs.readFileSync(req.file.path);
-      const parsed = await pdfParse(buffer);
+      const parsed = await pdfParse(req.file.buffer);
       const pieces = chunkText(parsed.text);
 
       if (pieces.length === 0) {
@@ -89,7 +92,7 @@ export const deleteKnowledgeFile = async (req, res) => {
     if (!file) return res.status(404).json({ message: "File not found" });
 
     await Chunk.deleteMany({ fileId: file._id, userId: req.userId });
-    fs.unlink(file.fileUrl, () => {});
+    await deleteFromCloudinary(file.cloudinaryPublicId, "raw");
 
     res.json({ message: "Knowledge file deleted" });
   } catch (err) {

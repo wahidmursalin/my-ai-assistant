@@ -1,7 +1,6 @@
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
-import path from "path";
 import { connectDB } from "./config/db.js";
 
 import authRoutes from "./routes/authRoutes.js";
@@ -17,9 +16,10 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// Serves uploaded chat images (and anything else in src/uploads) so the
-// frontend can display them, e.g. http://localhost:5000/uploads/<file>
-app.use("/uploads", express.static(path.join(process.cwd(), "src/uploads")));
+// Note: uploaded PDFs and chat images are stored on Cloudinary (not local disk),
+// so no static file serving is needed here — every file URL is already a full
+// https:// Cloudinary link, which also works cleanly when the frontend and
+// backend are deployed to different domains.
 
 app.get("/api/health", (req, res) => res.json({ status: "ok" }));
 
