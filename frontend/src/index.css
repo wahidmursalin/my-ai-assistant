@@ -1,0 +1,27 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply font-sans;
+  }
+
+  /* Light theme (default) — soft sky blue */
+  :root {
+    --night-bg: 224 242 254;
+    --night-card: 255 255 255;
+    --night-border: 191 219 254;
+    --night-input: 240 249 255;
+    --ink: 15 23 42;
+  }
+
+  /* Dark theme */
+  .dark {
+    --night-bg: 27 21 51;
+    --night-card: 36 28 66;
+    --night-border: 58 47 99;
+    --night-input: 42 34 80;
+    --ink: 255 255 255;
+  }
+}
