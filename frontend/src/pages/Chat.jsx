@@ -273,7 +273,7 @@ export default function Chat() {
                   ? "Add a caption or question about the image (optional)..."
                   : listening
                   ? "Listening..."
-                  : "Type a message... (try 'what's 235*17' or 'weather in Dhaka')"
+                  : "Type a message..."
               }
               className="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm"
             />
