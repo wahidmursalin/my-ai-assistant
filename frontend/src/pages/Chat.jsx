@@ -77,7 +77,7 @@ export default function Chat() {
       });
       setConversationId(data.conversationId);
       setMessages((prev) => [...prev, { role: "assistant", content: data.reply }]);
-      if (data.memorySaved) setNotice(" Saved that to memory.");
+      if (data.memorySaved) setNotice("🧠 Saved that to memory.");
       else if (data.toolsUsed?.length) setNotice(`🔧 Used: ${data.toolsUsed.join(", ")}`);
       else if (data.usedKnowledge) setNotice("📄 Used your uploaded documents to answer.");
 
@@ -163,7 +163,7 @@ export default function Chat() {
   return (
     <div className="h-screen flex flex-col">
       <Navbar />
-      <div className="flex-1 overflow-y-auto max-w-2xl w-full mx-auto px-6 py-6">
+      <div className="flex-1 overflow-y-auto max-w-2xl w-full mx-auto px-4 sm:px-6 py-6">
         <div className="flex items-start justify-between mb-1">
           <div>
             <h1 className="text-lg font-semibold text-gray-800">
@@ -190,7 +190,7 @@ export default function Chat() {
           {messages.map((m, i) => (
             <div key={i} className={`flex ${m.role === "user" ? "justify-end" : "justify-start"}`}>
               <div
-                className={`group flex items-end gap-1.5 max-w-[75%] ${m.role === "user" ? "flex-row-reverse" : ""}`}
+                className={`group flex items-end gap-1.5 max-w-[85%] sm:max-w-[75%] ${m.role === "user" ? "flex-row-reverse" : ""}`}
               >
                 <div
                   className={`px-4 py-2 rounded-2xl text-sm whitespace-pre-wrap ${
@@ -220,7 +220,7 @@ export default function Chat() {
         <div ref={bottomRef} />
       </div>
 
-      <form onSubmit={handleSend} className="border-t border-gray-200 bg-white px-6 py-4">
+      <form onSubmit={handleSend} className="border-t border-gray-200 bg-white px-3 sm:px-6 py-3 sm:py-4">
         <div className="max-w-2xl mx-auto">
           {imagePreview && (
             <div className="relative inline-block mb-2">
@@ -234,7 +234,7 @@ export default function Chat() {
               </button>
             </div>
           )}
-          <div className="flex gap-2">
+          <div className="flex gap-1.5 sm:gap-2">
             <input
               ref={imageInputRef}
               type="file"
@@ -246,7 +246,7 @@ export default function Chat() {
               type="button"
               onClick={() => imageInputRef.current.click()}
               title="Attach an image"
-              className="px-3 py-2 rounded-md text-sm border bg-gray-50 border-gray-300 text-gray-600 hover:bg-gray-100"
+              className="shrink-0 px-2.5 sm:px-3 py-2 rounded-md text-sm border bg-gray-50 border-gray-300 text-gray-600 hover:bg-gray-100"
             >
               📷
             </button>
@@ -256,7 +256,7 @@ export default function Chat() {
                 type="button"
                 onClick={handleMicClick}
                 title={listening ? "Stop listening" : "Speak your message"}
-                className={`px-3 py-2 rounded-md text-sm border ${
+                className={`shrink-0 px-2.5 sm:px-3 py-2 rounded-md text-sm border ${
                   listening
                     ? "bg-red-50 border-red-300 text-red-600 animate-pulse"
                     : "bg-gray-50 border-gray-300 text-gray-600 hover:bg-gray-100"
@@ -273,13 +273,13 @@ export default function Chat() {
                   ? "Add a caption or question about the image (optional)..."
                   : listening
                   ? "Listening..."
-                  : "Type a message..."
+                  : "Type a message... (try 'what's 235*17' or 'weather in Dhaka')"
               }
-              className="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm"
+              className="flex-1 min-w-0 px-3 py-2 border border-gray-300 rounded-md text-sm"
             />
             <button
               disabled={sending}
-              className="bg-brand-600 hover:bg-brand-700 disabled:opacity-50 text-white px-4 py-2 rounded-md text-sm font-medium"
+              className="shrink-0 bg-brand-600 hover:bg-brand-700 disabled:opacity-50 text-white px-3 sm:px-4 py-2 rounded-md text-sm font-medium"
             >
               Send
             </button>
