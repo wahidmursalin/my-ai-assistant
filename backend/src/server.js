@@ -1,6 +1,10 @@
+// dotenv must be the very first import — ES module imports execute in order,
+// so this guarantees .env is loaded before any other module (including ones
+// that read process.env at import time) gets evaluated.
+import "dotenv/config";
+
 import express from "express";
 import cors from "cors";
-import dotenv from "dotenv";
 import { connectDB } from "./config/db.js";
 
 import authRoutes from "./routes/authRoutes.js";
@@ -8,8 +12,6 @@ import assistantRoutes from "./routes/assistantRoutes.js";
 import memoryRoutes from "./routes/memoryRoutes.js";
 import chatRoutes from "./routes/chatRoutes.js";
 import knowledgeRoutes from "./routes/knowledgeRoutes.js";
-
-dotenv.config();
 
 const app = express();
 
