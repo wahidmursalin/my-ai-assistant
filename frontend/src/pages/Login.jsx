@@ -4,28 +4,34 @@ import { useAuth } from "../context/AuthContext.jsx";
 import AuthHero from "../components/AuthHero.jsx";
 import AuthWaves from "../components/AuthWaves.jsx";
 import ThemeToggle from "../components/ThemeToggle.jsx";
+import LoadingOverlay from "../components/LoadingOverlay.jsx";
 
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
+  const [submitting, setSubmitting] = useState(false);
   const { login } = useAuth();
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
+    setSubmitting(true);
     try {
       await login(email, password);
       navigate("/");
     } catch (err) {
       setError(err.response?.data?.message || "Login failed");
+    } finally {
+      setSubmitting(false);
     }
   };
 
   return (
     <div className="relative min-h-screen bg-night-bg overflow-hidden flex flex-col">
+      {submitting && <LoadingOverlay message="Logging you in..." />}
       <AuthWaves />
 
       {/* Top bar */}
@@ -109,7 +115,10 @@ export default function Login() {
               </button>
             </div>
 
-            <button className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-fuchsia-600 via-brand-600 to-indigo-600 hover:opacity-90 text-white py-2.5 rounded-lg text-sm font-medium transition-opacity">
+            <button
+              disabled={submitting}
+              className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-fuchsia-600 via-brand-600 to-indigo-600 hover:opacity-90 disabled:opacity-60 text-white py-2.5 rounded-lg text-sm font-medium transition-opacity"
+            >
               Login →
             </button>
 

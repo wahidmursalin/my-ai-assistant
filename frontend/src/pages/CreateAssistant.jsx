@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import api from "../services/api.js";
 import Navbar from "../components/Navbar.jsx";
+import LoadingOverlay from "../components/LoadingOverlay.jsx";
 
 export default function CreateAssistant() {
   const location = useLocation();
@@ -16,6 +17,7 @@ export default function CreateAssistant() {
     customInstructions: "",
   });
   const [error, setError] = useState("");
+  const [submitting, setSubmitting] = useState(false);
   const navigate = useNavigate();
 
   const update = (key) => (e) => setForm({ ...form, [key]: e.target.value });
@@ -23,16 +25,20 @@ export default function CreateAssistant() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
+    setSubmitting(true);
     try {
       const { data } = await api.post("/assistants", form);
       navigate(`/assistants/${data._id}/chat`);
     } catch (err) {
       setError(err.response?.data?.message || "Something went wrong");
+    } finally {
+      setSubmitting(false);
     }
   };
 
   return (
     <div>
+      {submitting && <LoadingOverlay message="Creating your AI..." />}
       <Navbar />
       <div className="max-w-xl mx-auto px-6 py-8">
         <h1 className="text-xl font-semibold text-gray-800 mb-6">Create New Assistant</h1>
@@ -86,7 +92,10 @@ export default function CreateAssistant() {
               rows={4} placeholder="e.g. Explain difficult topics with examples. Keep answers short."
               className="w-full mt-1 px-3 py-2 border border-gray-300 rounded-md text-sm" />
           </div>
-          <button className="w-full bg-brand-600 hover:bg-brand-700 text-white py-2 rounded-md text-sm font-medium">
+          <button
+            disabled={submitting}
+            className="w-full bg-brand-600 hover:bg-brand-700 disabled:opacity-60 text-white py-2 rounded-md text-sm font-medium"
+          >
             Create Now
           </button>
         </form>
