@@ -156,7 +156,13 @@ export default function Chat() {
       if (transcript.trim()) sendMessage(transcript);
     } catch (err) {
       setListening(false);
-      setNotice(`🎤 ${err.message}`);
+      if (err.message === "not-allowed" || err.message === "permission-denied") {
+        setNotice("🎤 Microphone is blocked. Tap the lock/site-info icon in your browser's address bar, allow Microphone access, then try again.");
+      } else if (err.message === "no-speech") {
+        setNotice("🎤 Didn't catch that — try again.");
+      } else {
+        setNotice(`🎤 ${err.message}`);
+      }
     }
   };
 
@@ -256,13 +262,27 @@ export default function Chat() {
                 type="button"
                 onClick={handleMicClick}
                 title={listening ? "Stop listening" : "Speak your message"}
-                className={`shrink-0 px-2.5 sm:px-3 py-2 rounded-md text-sm border ${
+                className={`shrink-0 flex items-center justify-center px-2.5 sm:px-3 py-2 rounded-md border transition-colors ${
                   listening
-                    ? "bg-red-50 border-red-300 text-red-600 animate-pulse"
+                    ? "bg-red-50 border-red-300 text-red-600"
                     : "bg-gray-50 border-gray-300 text-gray-600 hover:bg-gray-100"
                 }`}
               >
-                🎤
+                {listening ? (
+                  <span className="relative flex items-center justify-center w-4 h-4">
+                    <span className="absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-60 animate-ping" />
+                    <svg viewBox="0 0 24 24" fill="currentColor" className="relative w-3.5 h-3.5">
+                      <rect x="6" y="6" width="12" height="12" rx="2" />
+                    </svg>
+                  </span>
+                ) : (
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4">
+                    <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z" />
+                    <path d="M19 10v2a7 7 0 0 1-14 0v-2" />
+                    <line x1="12" y1="19" x2="12" y2="23" />
+                    <line x1="8" y1="23" x2="16" y2="23" />
+                  </svg>
+                )}
               </button>
             )}
             <input
@@ -273,7 +293,7 @@ export default function Chat() {
                   ? "Add a caption or question about the image (optional)..."
                   : listening
                   ? "Listening..."
-                  : "Type a message..."
+                  : "Type a message... (try 'what's 235*17' or 'weather in Dhaka')"
               }
               className="flex-1 min-w-0 px-3 py-2 border border-gray-300 rounded-md text-sm"
             />
