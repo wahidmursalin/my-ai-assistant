@@ -1,17 +1,19 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import api from "../services/api.js";
 import { useAuth } from "../context/AuthContext.jsx";
-import ThemeToggle from "../components/ThemeToggle.jsx";
+import { useAssistants } from "../context/AssistantsContext.jsx";
+import AppLayout, { Avatar } from "../components/AppLayout.jsx";
+import Icon from "../components/AuthIcons.jsx";
 
 const QUICK_ACTIONS = [
-  { icon: "💡", label: "Explain", personality: "encouraging", desc: "Explains things simply" },
-  { icon: "💻", label: "Code", personality: "professional", desc: "Helps you write code" },
-  { icon: "✍️", label: "Write", personality: "friendly", desc: "Drafts and edits writing" },
-  { icon: "📚", label: "Learn", personality: "encouraging", desc: "Tutors you on a topic" },
+  { icon: "bulb", label: "Explain", personality: "encouraging", desc: "Explains things simply", tone: "bg-amber-100 text-amber-600" },
+  { icon: "code", label: "Code", personality: "professional", desc: "Helps you write code", tone: "bg-orange-100 text-orange-600" },
+  { icon: "pen", label: "Write", personality: "friendly", desc: "Drafts and edits writing", tone: "bg-rose-100 text-rose-500" },
+  { icon: "book", label: "Learn", personality: "encouraging", desc: "Tutors you on a topic", tone: "bg-yellow-100 text-yellow-600" },
 ];
 
-const firstName = (fullName) => fullName?.split(" ")[0] || "there";
+const capitalize = (s) => (s ? s.charAt(0).toUpperCase() + s.slice(1) : s);
+const firstName = (fullName) => capitalize(fullName?.split(" ")[0]) || "there";
 
 const getGreeting = () => {
   const hour = new Date().getHours();
@@ -23,176 +25,140 @@ const getGreeting = () => {
 };
 
 export default function Dashboard() {
-  const { user, logout } = useAuth();
+  const { user } = useAuth();
   const navigate = useNavigate();
-  const [assistants, setAssistants] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [sidebarOpen, setSidebarOpen] = useState(false); // mobile drawer state
+  const { assistants, loading, error, reload, remove } = useAssistants();
+  const [ask, setAsk] = useState("");
 
-  useEffect(() => {
-    api.get("/assistants").then((res) => {
-      setAssistants(res.data);
-      setLoading(false);
-    });
-  }, []);
+  const handleAsk = (e) => {
+    e.preventDefault();
+    const text = ask.trim();
+    if (assistants.length > 0) {
+      navigate(`/assistants/${assistants[0]._id}/chat`, { state: { prefill: text } });
+    } else {
+      navigate("/assistants/new", { state: { description: text } });
+    }
+  };
 
   const handleDelete = async (id) => {
     if (!confirm("Delete this assistant and all of its memory/chat history?")) return;
-    await api.delete(`/assistants/${id}`);
-    setAssistants((prev) => prev.filter((a) => a._id !== id));
-  };
-
-  const handleLogout = () => {
-    logout();
-    navigate("/login");
+    await remove(id);
   };
 
   return (
-    <div className="min-h-screen bg-night-bg md:flex">
-      {/* Mobile top bar — visible below md, holds the menu toggle */}
-      <div className="md:hidden flex items-center justify-between px-4 py-3 border-b border-night-border">
-        <button
-          onClick={() => setSidebarOpen(true)}
-          aria-label="Open menu"
-          className="text-ink/70 text-xl leading-none px-1"
-        >
-          ☰
-        </button>
-        <div className="flex items-center gap-2 text-ink font-display font-bold text-base">
-          <span></span> Custom AI
-        </div>
-        <ThemeToggle />
-      </div>
+    <AppLayout>
+      <div className="max-w-4xl mx-auto px-4 sm:px-8 py-8 sm:py-12">
+        <h1 className="font-display text-3xl sm:text-4xl font-extrabold text-ink tracking-tight">
+          {getGreeting()}, <span className="text-orange-500">{firstName(user?.name)}</span>
+        </h1>
+        <p className="text-ink/60 mt-2">How can I help you today?</p>
 
-      {/* Backdrop for mobile drawer */}
-      {sidebarOpen && (
-        <div
-          onClick={() => setSidebarOpen(false)}
-          className="fixed inset-0 bg-black/60 z-30 md:hidden"
-        />
-      )}
-
-      {/* Sidebar — fixed drawer on mobile, static column on md+ */}
-      <aside
-        className={`fixed md:static top-0 left-0 h-full md:h-auto w-64 shrink-0 border-r border-night-border bg-night-bg z-40 flex flex-col transition-transform duration-200 ${
-          sidebarOpen ? "translate-x-0" : "-translate-x-full"
-        } md:translate-x-0`}
-      >
-        <div className="px-5 py-5 flex items-center justify-between">
-          <div className="flex items-center gap-2 text-ink font-display font-bold text-lg">
-            <span></span> Custom AI
-          </div>
+        {/* Ask box */}
+        <form onSubmit={handleAsk} className="mt-7 relative">
+          <input
+            value={ask}
+            onChange={(e) => setAsk(e.target.value)}
+            placeholder={assistants.length ? `Ask ${assistants[0].name} anything...` : "Describe the AI you want to create..."}
+            className="field !h-14 !pl-5 !pr-16 !rounded-2xl !text-[15px]"
+          />
           <button
-            onClick={() => setSidebarOpen(false)}
-            aria-label="Close menu"
-            className="md:hidden text-ink/50 text-lg leading-none"
+            aria-label="Start"
+            className="absolute right-2 top-1/2 -translate-y-1/2 w-10 h-10 rounded-xl bg-gradient-to-r from-orange-400 to-orange-500 text-white flex items-center justify-center shadow-md shadow-orange-500/25 hover:brightness-105 transition"
           >
-            ✕
+            <Icon name="send" className="w-[18px] h-[18px]" />
           </button>
-        </div>
+        </form>
 
-        <div className="px-3">
-          <Link
-            to="/assistants/new"
-            onClick={() => setSidebarOpen(false)}
-            className="flex items-center justify-center gap-2 w-full bg-gradient-to-r from-brand-600 to-fuchsia-600 hover:from-brand-500 hover:to-fuchsia-500 text-white text-sm font-medium py-2.5 rounded-lg transition-all"
-          >
-            + New Assistant
-          </Link>
-        </div>
-
-        <div className="mt-6 px-5 text-xs font-medium text-ink/30 tracking-wide">Your assistants</div>
-        <nav className="flex-1 overflow-y-auto px-3 mt-2 space-y-1">
-          {assistants.map((a) => (
+        {/* Quick actions */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-4">
+          {QUICK_ACTIONS.map((qa) => (
             <Link
-              key={a._id}
-              to={`/assistants/${a._id}/chat`}
-              onClick={() => setSidebarOpen(false)}
-              className="block px-2.5 py-2 rounded-lg text-sm text-ink/70 hover:bg-night-card hover:text-ink transition-colors truncate"
+              key={qa.label}
+              to="/assistants/new"
+              state={{ personality: qa.personality, description: qa.desc }}
+              className="card px-3 py-4 flex flex-col items-center gap-2 hover:-translate-y-0.5 hover:border-orange-300 transition-all"
             >
-              {a.name}
+              <span className={`w-10 h-10 rounded-xl flex items-center justify-center ${qa.tone}`}>
+                <Icon name={qa.icon} className="w-5 h-5" />
+              </span>
+              <span className="text-sm font-medium text-ink/80">{qa.label}</span>
             </Link>
           ))}
-          {!loading && assistants.length === 0 && (
-            <p className="px-2.5 text-xs text-ink/25">No assistants yet</p>
-          )}
-        </nav>
-
-        <div className="px-3 py-4 border-t border-night-border flex items-center gap-2">
-          <button
-            onClick={handleLogout}
-            className="flex-1 text-left px-2.5 py-2 rounded-lg text-sm text-ink/50 hover:bg-night-card hover:text-ink transition-colors"
-          >
-            Logout
-          </button>
-          <ThemeToggle />
         </div>
-      </aside>
 
-      {/* Main */}
-      <main className="flex-1 overflow-y-auto min-w-0">
-        <div className="max-w-3xl mx-auto px-4 sm:px-8 py-8 sm:py-14">
-          <h1 className="font-display text-2xl sm:text-3xl font-semibold text-ink">
-            {getGreeting()}, {firstName(user?.name)}
-          </h1>
-          <p className="text-ink/40 mt-2">How can I help you today?</p>
+        {/* Assistants */}
+        <div className="mt-10">
+          <h2 className="text-xs font-semibold text-ink/40 uppercase tracking-wider mb-3">Your assistants</h2>
 
-          <div className="mt-8 flex gap-2">
-            <Link
-              to="/assistants/new"
-              className="flex-1 bg-night-card border border-night-border rounded-xl px-4 py-3.5 text-ink/30 text-sm hover:border-brand-500/40 transition-colors"
-            >
-              Ask me anything — create an AI to get started
-            </Link>
-          </div>
-
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-4">
-            {QUICK_ACTIONS.map((qa) => (
-              <Link
-                key={qa.label}
-                to="/assistants/new"
-                state={{ personality: qa.personality, description: qa.desc }}
-                className="bg-night-card border border-night-border rounded-xl px-3 py-3 text-center hover:border-brand-500/40 transition-colors"
-              >
-                <div className="text-lg">{qa.icon}</div>
-                <div className="text-xs text-ink/60 mt-1">{qa.label}</div>
-              </Link>
-            ))}
-          </div>
-
-          <div className="mt-12">
-            <h2 className="text-xs font-medium text-ink/30 tracking-wide mb-3">Your assistants</h2>
-
-            {loading && <p className="text-ink/30 text-sm">Loading...</p>}
-
-            {!loading && assistants.length === 0 && (
-              <div className="text-center text-ink/30 text-sm border border-dashed border-night-border rounded-xl py-14 px-4">
-                You haven't created any AI assistants yet.
-              </div>
-            )}
-
+          {loading && (
             <div className="grid sm:grid-cols-2 gap-3">
-              {assistants.map((a) => (
-                <div key={a._id} className="bg-night-card border border-night-border rounded-xl p-5">
-                  <h3 className="font-medium text-ink">{a.name}</h3>
-                  <p className="text-sm text-ink/40 mt-1">{a.description || "No description"}</p>
-                  <div className="flex gap-2 mt-3 text-xs text-ink/40">
-                    <span className="bg-ink/5 px-2 py-1 rounded">{a.personality}</span>
-                    <span className="bg-ink/5 px-2 py-1 rounded">{a.language}</span>
-                  </div>
-                  <div className="flex flex-wrap gap-x-3 gap-y-2 mt-4 text-sm">
-                    <Link to={`/assistants/${a._id}/chat`} className="text-brand-400 font-medium">Chat</Link>
-                    <Link to={`/assistants/${a._id}/teach`} className="text-ink/50 hover:text-ink">Teach</Link>
-                    <Link to={`/assistants/${a._id}/memory`} className="text-ink/50 hover:text-ink">Memory</Link>
-                    <Link to={`/assistants/${a._id}/knowledge`} className="text-ink/50 hover:text-ink">Knowledge</Link>
-                    <button onClick={() => handleDelete(a._id)} className="text-rose-400 sm:ml-auto">Delete</button>
-                  </div>
-                </div>
+              {[0, 1].map((i) => (
+                <div key={i} className="card h-36 animate-pulse" />
               ))}
             </div>
+          )}
+
+          {!loading && error && (
+            <div className="card p-6 text-center">
+              <p className="text-sm text-ink/70">{error}</p>
+              <button onClick={reload} className="btn-primary mt-4">Try again</button>
+            </div>
+          )}
+
+          {!loading && !error && assistants.length === 0 && (
+            <div className="text-center text-ink/50 text-sm border-2 border-dashed border-night-border rounded-2xl py-12 px-4">
+              You haven't created any AI assistants yet.
+              <div className="mt-4">
+                <Link to="/assistants/new" className="btn-primary">
+                  <Icon name="plus" className="w-4 h-4" /> Create your first one
+                </Link>
+              </div>
+            </div>
+          )}
+
+          <div className="grid sm:grid-cols-2 gap-3">
+            {assistants.map((a) => (
+              <div key={a._id} className="card p-5 hover:border-orange-300 transition-colors">
+                <div className="flex items-start gap-3">
+                  <Avatar name={a.name} className="w-11 h-11 text-lg" />
+                  <div className="min-w-0 flex-1">
+                    <h3 className="font-semibold text-ink truncate">{a.name}</h3>
+                    <p className="text-sm text-ink/50 mt-0.5 line-clamp-2">{a.description || "No description"}</p>
+                  </div>
+                  <button
+                    onClick={() => handleDelete(a._id)}
+                    title="Delete"
+                    aria-label="Delete assistant"
+                    className="w-8 h-8 shrink-0 rounded-lg bg-rose-50 text-rose-400 hover:bg-rose-100 hover:text-rose-500 flex items-center justify-center transition-colors"
+                  >
+                    <Icon name="trash" className="w-4 h-4" />
+                  </button>
+                </div>
+
+                <div className="flex flex-wrap gap-2 mt-3 text-xs">
+                  <span className="bg-orange-100 text-orange-700 px-2.5 py-1 rounded-full">{a.personality}</span>
+                  <span className="bg-amber-100 text-amber-700 px-2.5 py-1 rounded-full">{a.language}</span>
+                </div>
+
+                <div className="flex flex-wrap items-center gap-1.5 mt-4">
+                  <Link to={`/assistants/${a._id}/chat`} className="btn-primary !py-1.5 !px-2.5 !gap-1 !text-[13px]">
+                    <Icon name="chat" className="w-4 h-4" /> Chat
+                  </Link>
+                  <Link to={`/assistants/${a._id}/teach`} className="btn-soft !px-2 !gap-1 !text-[13px]" title="Teach">
+                    <Icon name="cap" className="w-4 h-4" /> <span>Teach</span>
+                  </Link>
+                  <Link to={`/assistants/${a._id}/memory`} className="btn-soft !px-2 !gap-1 !text-[13px]" title="Memory">
+                    <Icon name="brain" className="w-4 h-4" /> <span>Memory</span>
+                  </Link>
+                  <Link to={`/assistants/${a._id}/knowledge`} className="btn-soft !px-2 !gap-1 !text-[13px]" title="Knowledge">
+                    <Icon name="file" className="w-4 h-4" /> <span>Knowledge</span>
+                  </Link>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
-      </main>
-    </div>
+      </div>
+    </AppLayout>
   );
 }

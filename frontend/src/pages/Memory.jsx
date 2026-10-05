@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import api from "../services/api.js";
-import Navbar from "../components/Navbar.jsx";
+import AppLayout, { PageHeader } from "../components/AppLayout.jsx";
+import Icon from "../components/AuthIcons.jsx";
 
 const TYPE_COLORS = {
   preference: "bg-blue-100 text-blue-700",
-  personal_info: "bg-purple-100 text-purple-700",
+  personal_info: "bg-violet-100 text-violet-700",
   instruction: "bg-amber-100 text-amber-700",
   interest: "bg-pink-100 text-pink-700",
   project: "bg-green-100 text-green-700",
@@ -14,7 +15,6 @@ const TYPE_COLORS = {
 
 export default function Memory() {
   const { id } = useParams();
-  const navigate = useNavigate();
   const [memories, setMemories] = useState([]);
   const [content, setContent] = useState("");
   const [type, setType] = useState("preference");
@@ -39,48 +39,57 @@ export default function Memory() {
   };
 
   return (
-    <div>
-      <Navbar />
-      <div className="max-w-xl mx-auto px-6 py-8">
-        <h1 className="text-xl font-semibold text-gray-800 mb-6">🧠 AI Memory</h1>
+    <AppLayout>
+      <div className="max-w-2xl mx-auto px-4 sm:px-6 py-8">
+        <PageHeader icon="brain" title="AI Memory" subtitle="Things your assistant should always remember." />
 
-        <form onSubmit={handleAdd} className="flex gap-2 mb-6">
+        <form onSubmit={handleAdd} className="card p-3 flex flex-col sm:flex-row gap-2 mb-6">
           <input
             value={content}
             onChange={(e) => setContent(e.target.value)}
             placeholder="Add something for the AI to remember..."
-            className="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm"
+            className="field flex-1"
           />
-          <select value={type} onChange={(e) => setType(e.target.value)}
-            className="px-2 py-2 border border-gray-300 rounded-md text-sm">
-            <option value="preference">preference</option>
-            <option value="personal_info">personal_info</option>
-            <option value="instruction">instruction</option>
-            <option value="interest">interest</option>
-            <option value="project">project</option>
-            <option value="temporary">temporary</option>
-          </select>
-          <button className="bg-brand-600 hover:bg-brand-700 text-white px-4 py-2 rounded-md text-sm">Add</button>
+          <div className="flex gap-2">
+            <select value={type} onChange={(e) => setType(e.target.value)} className="field !w-auto flex-1 sm:flex-none">
+              <option value="preference">preference</option>
+              <option value="personal_info">personal_info</option>
+              <option value="instruction">instruction</option>
+              <option value="interest">interest</option>
+              <option value="project">project</option>
+              <option value="temporary">temporary</option>
+            </select>
+            <button className="btn-primary">
+              <Icon name="plus" className="w-4 h-4" /> Add
+            </button>
+          </div>
         </form>
 
         <div className="space-y-2">
           {memories.length === 0 && (
-            <p className="text-gray-500 text-sm">No memories saved yet.</p>
+            <p className="text-center text-ink/50 text-sm border-2 border-dashed border-night-border rounded-2xl py-10">
+              No memories saved yet.
+            </p>
           )}
           {memories.map((m) => (
-            <div key={m._id} className="flex items-center justify-between bg-white border border-gray-200 rounded-lg px-4 py-3">
-              <div>
-                <p className="text-sm text-gray-800">{m.content}</p>
-                <span className={`inline-block mt-1 text-xs px-2 py-0.5 rounded ${TYPE_COLORS[m.type] || ""}`}>
+            <div key={m._id} className="card flex items-center justify-between gap-3 px-4 py-3">
+              <div className="min-w-0">
+                <p className="text-sm text-ink">{m.content}</p>
+                <span className={`inline-block mt-1.5 text-xs px-2.5 py-0.5 rounded-full ${TYPE_COLORS[m.type] || ""}`}>
                   {m.type}
                 </span>
               </div>
-              <button onClick={() => handleDelete(m._id)} className="text-red-500 text-sm">Delete</button>
+              <button
+                onClick={() => handleDelete(m._id)}
+                aria-label="Delete memory"
+                className="w-8 h-8 shrink-0 rounded-lg bg-rose-50 text-rose-400 hover:bg-rose-100 hover:text-rose-500 flex items-center justify-center transition-colors"
+              >
+                <Icon name="trash" className="w-4 h-4" />
+              </button>
             </div>
           ))}
         </div>
-        <button onClick={() => navigate(-1)} className="text-sm text-gray-500 mt-6">← Back</button>
       </div>
-    </div>
+    </AppLayout>
   );
 }

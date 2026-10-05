@@ -3,14 +3,14 @@ import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext.jsx";
 import AuthHero from "../components/AuthHero.jsx";
 import AuthWaves from "../components/AuthWaves.jsx";
-import ThemeToggle from "../components/ThemeToggle.jsx";
+import AuthTopBar from "../components/AuthTopBar.jsx";
+import AuthInput from "../components/AuthInput.jsx";
+import CatMascot from "../components/CatMascot.jsx";
 import LoadingOverlay from "../components/LoadingOverlay.jsx";
-import FloatingInput from "../components/FloatingInput.jsx";
 
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const { login } = useAuth();
@@ -31,31 +31,13 @@ export default function Login() {
   };
 
   return (
-    <div className="relative min-h-screen bg-night-bg overflow-hidden flex flex-col">
-      {submitting && <LoadingOverlay message="Logging you in..." />}
+    <div className="auth-theme relative min-h-screen bg-night-bg overflow-hidden flex flex-col">
+      {submitting && <LoadingOverlay tone="orange" message="Logging you in..." />}
       <AuthWaves />
 
-      {/* Top bar */}
-      <div className="relative z-10 flex items-center justify-between px-6 sm:px-10 py-6">
-        <div className="flex items-center gap-2 text-ink font-display font-bold text-xl">
-          Custom <span className="text-brand-400">AI</span>
-        </div>
-        <div className="flex items-center gap-3">
-          <ThemeToggle />
-          <div className="hidden sm:flex items-center gap-3 text-sm text-ink/60">
-            Don't have an account?
-            <Link
-              to="/register"
-              className="flex items-center gap-1.5 text-ink border border-brand-400/40 rounded-lg px-4 py-1.5 hover:bg-brand-500/15 hover:border-brand-300 hover:scale-105 transition-all duration-200"
-            >
-              Register →
-            </Link>
-          </div>
-        </div>
-      </div>
+      <AuthTopBar prompt="Don't have an account?" to="/register" cta="Register" />
 
-      {/* Content */}
-      <div className="relative z-10 flex-1 grid grid-cols-1 lg:grid-cols-[1.05fr_0.95fr] gap-6 lg:gap-2 items-center px-6 sm:px-10 pb-14 max-w-6xl mx-auto w-full">
+      <div className="relative z-10 flex-1 grid grid-cols-1 lg:grid-cols-[1.1fr_0.9fr] gap-8 items-center px-6 sm:px-10 pb-14 max-w-7xl mx-auto w-full">
         <div className="hidden lg:block">
           <AuthHero
             eyebrow="Your Personal AI Assistant"
@@ -68,58 +50,35 @@ export default function Login() {
         <div className="w-full max-w-md mx-auto lg:mr-0">
           <form
             onSubmit={handleSubmit}
-            className="bg-night-card/80 backdrop-blur border border-night-border rounded-2xl p-6 sm:p-8 shadow-2xl shadow-black/40"
+            className="bg-night-card/90 backdrop-blur border border-night-border rounded-3xl p-6 sm:p-7 shadow-2xl shadow-orange-500/15"
           >
-            <div className="flex items-center gap-2 text-ink font-display font-bold text-lg lg:hidden mb-6">
-              Custom <span className="text-brand-400">AI</span>
+            <div className="flex items-center gap-4 mb-6">
+              <CatMascot headOnly className="w-16 h-14 shrink-0" />
+              <div>
+                <h2 className="font-display text-2xl font-extrabold text-ink leading-tight">Welcome back</h2>
+                <p className="text-ink/60 text-[15px] mt-1">Continue your AI journey.</p>
+              </div>
             </div>
 
-            <h2 className="font-display text-xl font-semibold text-ink mb-1">Welcome back</h2>
-            <p className="text-ink/40 text-sm mb-6">Continue your AI journey.</p>
-
             {error && (
-              <p className="text-sm text-rose-400 bg-rose-500/10 border border-rose-500/20 rounded-lg px-3 py-2 mb-4">
+              <p className="text-sm text-rose-600 bg-rose-500/10 border border-rose-500/20 rounded-lg px-3 py-2 mb-4">
                 {error}
               </p>
             )}
 
-            <FloatingInput
-              icon="✉️"
-              label="Email"
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-            />
-
-            <FloatingInput
-              icon="🔒"
-              label="Password"
-              type={showPassword ? "text" : "password"}
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              rightElement={
-                <button
-                  type="button"
-                  onClick={() => setShowPassword((s) => !s)}
-                  className="absolute right-3.5 top-1/2 -translate-y-1/2 text-ink/30 hover:text-ink/60 text-sm"
-                >
-                  {showPassword ? "🙈" : "👁️"}
-                </button>
-              }
-            />
+            <AuthInput icon="mail" label="Email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
+            <AuthInput icon="lock" label="Password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
 
             <button
               disabled={submitting}
-              className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-fuchsia-600 via-brand-600 to-indigo-600 hover:opacity-90 disabled:opacity-60 text-white py-2.5 rounded-lg text-sm font-medium transition-opacity mt-2"
+              className="w-full h-12 flex items-center justify-center gap-2 bg-gradient-to-r from-orange-500 to-orange-400 hover:brightness-105 disabled:opacity-60 text-white rounded-xl text-[15px] font-bold shadow-lg shadow-orange-500/30 transition mt-1"
             >
               Login →
             </button>
 
-            <p className="text-sm text-ink/40 mt-5 text-center">
+            <p className="text-sm text-ink/70 mt-5 text-center">
               Don't have an account?{" "}
-              <Link to="/register" className="text-brand-300 hover:text-brand-200">
+              <Link to="/register" className="font-semibold text-orange-600 dark:text-orange-400 hover:underline">
                 Register
               </Link>
             </p>

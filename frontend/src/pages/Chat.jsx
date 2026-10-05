@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useLocation, useParams } from "react-router-dom";
 import api from "../services/api.js";
-import Navbar from "../components/Navbar.jsx";
+import AppLayout, { Avatar } from "../components/AppLayout.jsx";
+import Icon from "../components/AuthIcons.jsx";
 import {
   getLangCode,
   isRecognitionSupported,
@@ -52,12 +53,12 @@ function ThinkingIndicator() {
   }, []);
 
   return (
-    <div className="flex items-center gap-2 text-xs text-gray-400 px-1">
+    <div className="flex items-center gap-2 text-xs text-ink/50 px-1">
       <span>{THINKING_WORDS[wordIndex]}</span>
       <span className="flex gap-0.5">
-        <span className="w-1 h-1 rounded-full bg-gray-400 animate-bounce" style={{ animationDelay: "0ms" }} />
-        <span className="w-1 h-1 rounded-full bg-gray-400 animate-bounce" style={{ animationDelay: "150ms" }} />
-        <span className="w-1 h-1 rounded-full bg-gray-400 animate-bounce" style={{ animationDelay: "300ms" }} />
+        <span className="w-1 h-1 rounded-full bg-orange-300 animate-bounce" style={{ animationDelay: "0ms" }} />
+        <span className="w-1 h-1 rounded-full bg-orange-300 animate-bounce" style={{ animationDelay: "150ms" }} />
+        <span className="w-1 h-1 rounded-full bg-orange-300 animate-bounce" style={{ animationDelay: "300ms" }} />
       </span>
     </div>
   );
@@ -65,10 +66,11 @@ function ThinkingIndicator() {
 
 export default function Chat() {
   const { id } = useParams();
+  const location = useLocation();
   const [assistant, setAssistant] = useState(null);
   const [conversationId, setConversationId] = useState(null);
   const [messages, setMessages] = useState([]);
-  const [input, setInput] = useState("");
+  const [input, setInput] = useState(location.state?.prefill || "");
   const [sending, setSending] = useState(false);
   const [notice, setNotice] = useState("");
   const [listening, setListening] = useState(false);
@@ -235,27 +237,30 @@ export default function Chat() {
     // browser's address bar showing/hiding, which was causing the layout to
     // jump and leave the chat scrolled to the wrong position after the
     // keyboard closed. dvh updates live with the real visible area.
-    <div className="h-[100dvh] flex flex-col overflow-hidden">
-      <Navbar />
+    <AppLayout scroll={false}>
       <div className="flex-1 overflow-y-auto max-w-2xl w-full mx-auto px-4 sm:px-6 py-6">
         <div className="flex items-start justify-between mb-1">
-          <div>
-            <h1 className="text-lg font-semibold text-gray-800">
-              {assistant ? assistant.name : "Loading..."}
-            </h1>
-            {assistant && <p className="text-xs text-gray-500">{assistant.personality} · {assistant.language}</p>}
+          <div className="flex items-center gap-3">
+            <Avatar name={assistant?.name} className="w-10 h-10 text-base" />
+            <div>
+              <h1 className="font-display text-lg font-extrabold text-ink leading-tight">
+                {assistant ? assistant.name : "Loading..."}
+              </h1>
+              {assistant && <p className="text-xs text-ink/50">{assistant.personality} · {assistant.language}</p>}
+            </div>
           </div>
           {isSpeechSupported() && (
-            <label className="flex items-center gap-1.5 text-xs text-gray-500 cursor-pointer select-none">
+            <label className="flex items-center gap-1.5 text-xs text-ink/60 cursor-pointer select-none">
               <input
                 type="checkbox"
+                className="accent-orange-500"
                 checked={autoSpeak}
                 onChange={(e) => {
                   setAutoSpeak(e.target.checked);
                   if (!e.target.checked) stopSpeaking();
                 }}
               />
-              🔊 Auto-speak replies
+              <Icon name="volume" className="w-4 h-4" /> Auto-speak replies
             </label>
           )}
         </div>
@@ -268,7 +273,7 @@ export default function Chat() {
               >
                 <div
                   className={`px-4 py-2 rounded-2xl text-sm whitespace-pre-wrap ${
-                    m.role === "user" ? "bg-brand-600 text-white" : "bg-white border border-gray-200 text-gray-800"
+                    m.role === "user" ? "bg-brand-600 text-white rounded-br-md shadow-sm shadow-orange-500/20" : "bg-night-card border border-night-border text-ink rounded-bl-md"
                   }`}
                 >
                   {m.imageUrl && (
@@ -287,29 +292,29 @@ export default function Chat() {
                   <button
                     onClick={() => speak(m.content, langCode)}
                     title="Play this reply"
-                    className="opacity-0 group-hover:opacity-100 text-gray-400 hover:text-brand-600 text-sm"
+                    className="opacity-0 group-hover:opacity-100 text-ink/40 hover:text-orange-600"
                   >
-                    🔊
+                    <Icon name="volume" className="w-4 h-4" />
                   </button>
                 )}
               </div>
             </div>
           ))}
           {sending && <ThinkingIndicator />}
-          {notice && <p className="text-xs text-brand-600">{notice}</p>}
+          {notice && <p className="text-xs text-orange-600">{notice}</p>}
         </div>
         <div ref={bottomRef} />
       </div>
 
-      <form onSubmit={handleSend} className="border-t border-gray-200 bg-white px-3 sm:px-6 py-3 sm:py-4">
+      <form onSubmit={handleSend} className="border-t border-night-border bg-night-card/90 backdrop-blur px-3 sm:px-6 py-3 sm:py-4">
         <div className="max-w-2xl mx-auto">
           {imagePreview && (
             <div className="relative inline-block mb-2">
-              <img src={imagePreview} alt="Selected" className="h-16 w-16 object-cover rounded-lg border border-gray-300" />
+              <img src={imagePreview} alt="Selected" className="h-16 w-16 object-cover rounded-lg border border-night-border" />
               <button
                 type="button"
                 onClick={removeImage}
-                className="absolute -top-2 -right-2 bg-gray-800 text-white rounded-full w-5 h-5 text-xs leading-none"
+                className="absolute -top-2 -right-2 bg-ink text-night-bg rounded-full w-5 h-5 text-xs leading-none"
               >
                 ✕
               </button>
@@ -327,9 +332,9 @@ export default function Chat() {
               type="button"
               onClick={() => imageInputRef.current.click()}
               title="Attach an image"
-              className="shrink-0 px-2.5 sm:px-3 py-2 rounded-md text-sm border bg-gray-50 border-gray-300 text-gray-600 hover:bg-gray-100"
+              className="shrink-0 px-2.5 sm:px-3 py-2 rounded-xl text-sm border bg-night-input border-night-border text-ink/60 hover:bg-orange-100 hover:text-orange-600 transition-colors"
             >
-              📷
+              <Icon name="camera" className="w-4 h-4" />
             </button>
 
             {isRecognitionSupported() && (
@@ -337,10 +342,10 @@ export default function Chat() {
                 type="button"
                 onClick={handleMicClick}
                 title={listening ? "Stop listening" : "Speak your message"}
-                className={`shrink-0 flex items-center justify-center px-2.5 sm:px-3 py-2 rounded-md border transition-colors ${
+                className={`shrink-0 flex items-center justify-center px-2.5 sm:px-3 py-2 rounded-xl border transition-colors ${
                   listening
                     ? "bg-red-50 border-red-300 text-red-600"
-                    : "bg-gray-50 border-gray-300 text-gray-600 hover:bg-gray-100"
+                    : "bg-night-input border-night-border text-ink/60 hover:bg-orange-100 hover:text-orange-600"
                 }`}
               >
                 {listening ? (
@@ -370,17 +375,18 @@ export default function Chat() {
                   ? "Listening..."
                   : "Type a message..."
               }
-              className="flex-1 min-w-0 px-3 py-2 border border-gray-300 rounded-md text-sm"
+              className="field flex-1 min-w-0 !py-2"
             />
             <button
               disabled={sending}
-              className="shrink-0 bg-brand-600 hover:bg-brand-700 disabled:opacity-50 text-white px-3 sm:px-4 py-2 rounded-md text-sm font-medium"
+              className="shrink-0 btn-primary !px-3 sm:!px-5 !py-2"
             >
-              Send
+              <span className="hidden sm:inline">Send</span>
+              <Icon name="send" className="w-4 h-4" />
             </button>
           </div>
         </div>
       </form>
-    </div>
+    </AppLayout>
   );
 }

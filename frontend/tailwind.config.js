@@ -6,12 +6,14 @@ export default {
     extend: {
       colors: {
         brand: {
-          50: "#f5f3ff",
-          100: "#ede9fe",
-          400: "#a78bfa",
-          500: "#7c3aed",
-          600: "#6d28d9",
-          700: "#5b21b6",
+          50: "#fff7ed",
+          100: "#ffedd5",
+          200: "#fed7aa",
+          300: "#fdba74",
+          400: "#fdba74",
+          500: "#fb923c",
+          600: "#fb923c",
+          700: "#f97316",
         },
         night: {
           bg: "rgb(var(--night-bg) / <alpha-value>)",

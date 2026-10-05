@@ -1,11 +1,10 @@
 import { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import api from "../services/api.js";
-import Navbar from "../components/Navbar.jsx";
+import AppLayout, { PageHeader } from "../components/AppLayout.jsx";
 
 export default function TeachAssistant() {
   const { id } = useParams();
-  const navigate = useNavigate();
   const [form, setForm] = useState({
     personality: "",
     language: "",
@@ -37,39 +36,36 @@ export default function TeachAssistant() {
   };
 
   return (
-    <div>
-      <Navbar />
-      <div className="max-w-xl mx-auto px-6 py-8">
-        <h1 className="text-xl font-semibold text-gray-800 mb-6">Teach Your AI</h1>
-        <form onSubmit={handleSubmit} className="bg-white border border-gray-200 rounded-xl p-6 space-y-4">
+    <AppLayout>
+      <div className="max-w-xl mx-auto px-4 sm:px-6 py-8">
+        <PageHeader icon="cap" title="Teach Your AI" subtitle="Shape how it behaves and what it remembers." />
+        <form onSubmit={handleSubmit} className="card p-6 space-y-4">
           <div>
-            <label className="text-sm text-gray-600">Personality</label>
-            <input value={form.personality} onChange={update("personality")}
-              className="w-full mt-1 px-3 py-2 border border-gray-300 rounded-md text-sm" />
+            <label className="text-sm font-medium text-ink/70">Personality</label>
+            <input value={form.personality} onChange={update("personality")} className="field mt-1.5" />
           </div>
           <div>
-            <label className="text-sm text-gray-600">Language</label>
-            <input value={form.language} onChange={update("language")}
-              className="w-full mt-1 px-3 py-2 border border-gray-300 rounded-md text-sm" />
+            <label className="text-sm font-medium text-ink/70">Language</label>
+            <input value={form.language} onChange={update("language")} className="field mt-1.5" />
           </div>
           <div>
-            <label className="text-sm text-gray-600">How should it behave?</label>
-            <textarea value={form.customInstructions} onChange={update("customInstructions")} rows={4}
-              className="w-full mt-1 px-3 py-2 border border-gray-300 rounded-md text-sm" />
+            <label className="text-sm font-medium text-ink/70">How should it behave?</label>
+            <textarea value={form.customInstructions} onChange={update("customInstructions")} rows={4} className="field mt-1.5" />
           </div>
           <div>
-            <label className="text-sm text-gray-600">What should it remember? (optional, adds one memory)</label>
-            <textarea value={form.rememberThis} onChange={update("rememberThis")} rows={3}
+            <label className="text-sm font-medium text-ink/70">What should it remember? (optional, adds one memory)</label>
+            <textarea
+              value={form.rememberThis}
+              onChange={update("rememberThis")}
+              rows={3}
               placeholder="e.g. I am a Software Engineering student."
-              className="w-full mt-1 px-3 py-2 border border-gray-300 rounded-md text-sm" />
+              className="field mt-1.5"
+            />
           </div>
-          <button className="w-full bg-brand-600 hover:bg-brand-700 text-white py-2 rounded-md text-sm font-medium">
-            Teach AI
-          </button>
-          {saved && <p className="text-green-600 text-sm text-center">Saved!</p>}
+          <button className="btn-primary w-full !py-3">Teach AI</button>
+          {saved && <p className="text-emerald-600 text-sm text-center font-medium">Saved!</p>}
         </form>
-        <button onClick={() => navigate(-1)} className="text-sm text-gray-500 mt-4">← Back</button>
       </div>
-    </div>
+    </AppLayout>
   );
 }

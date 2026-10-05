@@ -7,21 +7,36 @@
     @apply font-sans;
   }
 
-  /* Light theme (default) — soft sky blue */
+  /* Light theme (default) - soft peach / light orange */
   :root {
-    --night-bg: 224 242 254;
-    --night-card: 255 255 255;
-    --night-border: 191 219 254;
-    --night-input: 240 249 255;
-    --ink: 15 23 42;
+    --night-bg: 255 244 232;
+    --night-card: 255 251 246;
+    --night-border: 253 218 178;
+    --night-input: 255 247 238;
+    --ink: 30 41 59;
   }
 
-  /* Dark theme */
+  /* Dark theme - warm dark */
   .dark {
-    --night-bg: 27 21 51;
-    --night-card: 36 28 66;
-    --night-border: 58 47 99;
-    --night-input: 42 34 80;
-    --ink: 255 255 255;
+    --night-bg: 28 20 15;
+    --night-card: 43 31 24;
+    --night-border: 110 70 40;
+    --night-input: 56 41 31;
+    --ink: 255 247 237;
+  }
+}
+
+@layer components {
+  .card {
+    @apply bg-night-card border border-night-border rounded-2xl shadow-sm shadow-orange-500/5;
+  }
+  .field {
+    @apply w-full px-3.5 py-2.5 bg-night-input border border-night-border rounded-xl text-sm text-ink placeholder:text-ink/40 outline-none transition focus:border-orange-400 focus:ring-4 focus:ring-orange-400/20;
+  }
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 bg-gradient-to-r from-orange-400 to-orange-500 hover:brightness-105 disabled:opacity-60 text-white font-semibold rounded-xl px-4 py-2.5 text-sm shadow-md shadow-orange-500/20 transition;
+  }
+  .btn-soft {
+    @apply inline-flex items-center justify-center gap-1.5 bg-orange-100 text-orange-700 hover:bg-orange-200 font-medium rounded-lg px-3 py-1.5 text-sm transition-colors;
   }
 }
