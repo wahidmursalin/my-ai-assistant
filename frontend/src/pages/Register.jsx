@@ -5,6 +5,7 @@ import AuthHero from "../components/AuthHero.jsx";
 import AuthWaves from "../components/AuthWaves.jsx";
 import ThemeToggle from "../components/ThemeToggle.jsx";
 import LoadingOverlay from "../components/LoadingOverlay.jsx";
+import FloatingInput from "../components/FloatingInput.jsx";
 
 export default function Register() {
   const [name, setName] = useState("");
@@ -83,55 +84,44 @@ export default function Register() {
               </p>
             )}
 
-            <label className="block text-xs font-medium text-ink/50 mb-1.5">Name</label>
-            <div className="relative mb-4">
-              <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-ink/30">👤</span>
-              <input
-                type="text"
-                placeholder="Your name"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                className="w-full pl-10 pr-3.5 py-2.5 bg-night-input border border-night-border rounded-lg text-sm text-ink placeholder-ink/25 outline-none focus:border-brand-500 transition-colors"
-                required
-              />
-            </div>
+            <FloatingInput
+              icon="👤"
+              label="Name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              required
+            />
 
-            <label className="block text-xs font-medium text-ink/50 mb-1.5">Email</label>
-            <div className="relative mb-4">
-              <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-ink/30">✉️</span>
-              <input
-                type="email"
-                placeholder="your@email.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="w-full pl-10 pr-3.5 py-2.5 bg-night-input border border-night-border rounded-lg text-sm text-ink placeholder-ink/25 outline-none focus:border-brand-500 transition-colors"
-                required
-              />
-            </div>
+            <FloatingInput
+              icon="✉️"
+              label="Email"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+            />
 
-            <label className="block text-xs font-medium text-ink/50 mb-1.5">Password</label>
-            <div className="relative mb-6">
-              <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-ink/30">🔒</span>
-              <input
-                type={showPassword ? "text" : "password"}
-                placeholder="••••••••"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="w-full pl-10 pr-10 py-2.5 bg-night-input border border-night-border rounded-lg text-sm text-ink placeholder-ink/25 outline-none focus:border-brand-500 transition-colors"
-                required
-              />
-              <button
-                type="button"
-                onClick={() => setShowPassword((s) => !s)}
-                className="absolute right-3.5 top-1/2 -translate-y-1/2 text-ink/30 hover:text-ink/60 text-sm"
-              >
-                {showPassword ? "🙈" : "👁️"}
-              </button>
-            </div>
+            <FloatingInput
+              icon="🔒"
+              label="Password"
+              type={showPassword ? "text" : "password"}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              rightElement={
+                <button
+                  type="button"
+                  onClick={() => setShowPassword((s) => !s)}
+                  className="absolute right-3.5 top-1/2 -translate-y-1/2 text-ink/30 hover:text-ink/60 text-sm"
+                >
+                  {showPassword ? "🙈" : "👁️"}
+                </button>
+              }
+            />
 
             <button
               disabled={submitting}
-              className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-fuchsia-600 via-brand-600 to-indigo-600 hover:opacity-90 disabled:opacity-60 text-white py-2.5 rounded-lg text-sm font-medium transition-opacity"
+              className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-fuchsia-600 via-brand-600 to-indigo-600 hover:opacity-90 disabled:opacity-60 text-white py-2.5 rounded-lg text-sm font-medium transition-opacity mt-2"
             >
               👤 Register →
             </button>

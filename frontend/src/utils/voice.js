@@ -18,13 +18,45 @@ export const isRecognitionSupported = () =>
 export const isSpeechSupported = () =>
   typeof window !== "undefined" && "speechSynthesis" in window;
 
+// Turn a raw getUserMedia/SpeechRecognition error into one of a small, known
+// set of reasons the UI already knows how to explain (see Chat.jsx).
+const normalizeError = (err) => {
+  const name = err?.name || err?.error || err?.message || "unknown";
+  if (name === "NotAllowedError" || name === "PermissionDeniedError" || name === "not-allowed") {
+    return new Error("not-allowed");
+  }
+  if (name === "NotFoundError" || name === "DevicesNotFoundError") {
+    return new Error("no-mic-found");
+  }
+  if (name === "no-speech") {
+    return new Error("no-speech");
+  }
+  return new Error(name);
+};
+
+// Explicitly ask for microphone access first. On most browsers this triggers
+// a clean native "Allow microphone?" prompt even in cases where starting
+// SpeechRecognition directly would silently fail — and if the user already
+// denied it, this gives us a clear NotAllowedError instead of a vague one.
+const ensureMicAccess = async () => {
+  if (!navigator.mediaDevices?.getUserMedia) return; // nothing we can pre-check, let SpeechRecognition try directly
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    stream.getTracks().forEach((t) => t.stop()); // we only needed the permission prompt, not the stream
+  } catch (err) {
+    throw normalizeError(err);
+  }
+};
+
 // Starts listening once and resolves with the transcript.
 // onInterim(text) is called with live partial results while the user is speaking.
-export const listenOnce = ({ language = "en-US", onInterim }) => {
+export const listenOnce = async ({ language = "en-US", onInterim }) => {
+  await ensureMicAccess();
+
   return new Promise((resolve, reject) => {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SpeechRecognition) {
-      reject(new Error("Speech recognition isn't supported in this browser"));
+      reject(new Error("unsupported"));
       return;
     }
 
@@ -45,7 +77,7 @@ export const listenOnce = ({ language = "en-US", onInterim }) => {
       if (onInterim) onInterim(finalTranscript + interim);
     };
 
-    recognition.onerror = (event) => reject(new Error(event.error || "Speech recognition error"));
+    recognition.onerror = (event) => reject(normalizeError(event));
     recognition.onend = () => resolve(finalTranscript.trim());
 
     recognition.start();

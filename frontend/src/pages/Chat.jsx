@@ -12,6 +12,30 @@ import {
   stopSpeaking,
 } from "../utils/voice.js";
 
+// Reveals `text` progressively, like it's being typed — purely a frontend
+// animation (the full reply already arrived from the backend). Only used for
+// a message that was *just* generated (see the `fresh` flag below), so
+// history loaded from the database shows instantly instead of re-"typing".
+function TypewriterText({ text, onTick }) {
+  const [shown, setShown] = useState("");
+
+  useEffect(() => {
+    setShown("");
+    let i = 0;
+    // Scale the step so very long replies don't take forever to finish.
+    const step = Math.max(1, Math.round(text.length / 150));
+    const interval = setInterval(() => {
+      i += step;
+      setShown(text.slice(0, i));
+      onTick?.();
+      if (i >= text.length) clearInterval(interval);
+    }, 15);
+    return () => clearInterval(interval);
+  }, [text]);
+
+  return <>{shown}</>;
+}
+
 export default function Chat() {
   const { id } = useParams();
   const [assistant, setAssistant] = useState(null);
@@ -76,7 +100,7 @@ export default function Chat() {
         message: userMsg.content,
       });
       setConversationId(data.conversationId);
-      setMessages((prev) => [...prev, { role: "assistant", content: data.reply }]);
+      setMessages((prev) => [...prev, { role: "assistant", content: data.reply, fresh: true }]);
       if (data.memorySaved) setNotice("🧠 Saved that to memory.");
       else if (data.toolsUsed?.length) setNotice(`🔧 Used: ${data.toolsUsed.join(", ")}`);
       else if (data.usedKnowledge) setNotice("📄 Used your uploaded documents to answer.");
@@ -84,7 +108,7 @@ export default function Chat() {
       if (autoSpeak) speak(data.reply, langCode);
     } catch (err) {
       const errText = `⚠️ ${err.response?.data?.message || "Something went wrong"}`;
-      setMessages((prev) => [...prev, { role: "assistant", content: errText }]);
+      setMessages((prev) => [...prev, { role: "assistant", content: errText, fresh: true }]);
     } finally {
       setSending(false);
     }
@@ -112,11 +136,11 @@ export default function Chat() {
         headers: { "Content-Type": "multipart/form-data" },
       });
       setConversationId(data.conversationId);
-      setMessages((prev) => [...prev, { role: "assistant", content: data.reply }]);
+      setMessages((prev) => [...prev, { role: "assistant", content: data.reply, fresh: true }]);
       if (autoSpeak) speak(data.reply, langCode);
     } catch (err) {
       const errText = `⚠️ ${err.response?.data?.message || "Something went wrong"}`;
-      setMessages((prev) => [...prev, { role: "assistant", content: errText }]);
+      setMessages((prev) => [...prev, { role: "assistant", content: errText, fresh: true }]);
     } finally {
       setSending(false);
     }
@@ -156,13 +180,13 @@ export default function Chat() {
       if (transcript.trim()) sendMessage(transcript);
     } catch (err) {
       setListening(false);
-      if (err.message === "not-allowed" || err.message === "permission-denied") {
-        setNotice("🎤 Microphone is blocked. Tap the lock/site-info icon in your browser's address bar, allow Microphone access, then try again.");
-      } else if (err.message === "no-speech") {
-        setNotice("🎤 Didn't catch that — try again.");
-      } else {
-        setNotice(`🎤 ${err.message}`);
-      }
+      const reasons = {
+        "not-allowed": "🎤 Microphone is blocked for this site. Tap the lock/site-info icon in your browser's address bar → Permissions → allow Microphone, then try again.",
+        "no-mic-found": "🎤 No microphone was found on this device.",
+        "no-speech": "🎤 Didn't catch that — try again.",
+        "unsupported": "🎤 Voice input isn't supported in this browser. Try Chrome, or just type your message.",
+      };
+      setNotice(reasons[err.message] || `🎤 ${err.message}`);
     }
   };
 
@@ -206,7 +230,14 @@ export default function Chat() {
                   {m.imageUrl && (
                     <img src={m.imageUrl} alt="Uploaded" className="rounded-lg mb-2 max-h-56 object-cover" />
                   )}
-                  {m.content}
+                  {m.role === "assistant" && m.fresh ? (
+                    <TypewriterText
+                      text={m.content}
+                      onTick={() => bottomRef.current?.scrollIntoView({ block: "end" })}
+                    />
+                  ) : (
+                    m.content
+                  )}
                 </div>
                 {m.role === "assistant" && isSpeechSupported() && (
                   <button
