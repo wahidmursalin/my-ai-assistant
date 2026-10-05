@@ -36,6 +36,33 @@ function TypewriterText({ text, onTick }) {
   return <>{shown}</>;
 }
 
+// Shown while waiting for the backend — cycles through a few status words
+// (like other AI apps do) plus a small bouncing-dots animation, instead of a
+// flat "Thinking..." the whole time.
+const THINKING_WORDS = ["Thinking", "Working on it", "Brainstorming", "Putting it together"];
+
+function ThinkingIndicator() {
+  const [wordIndex, setWordIndex] = useState(0);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setWordIndex((i) => (i + 1) % THINKING_WORDS.length);
+    }, 2200);
+    return () => clearInterval(interval);
+  }, []);
+
+  return (
+    <div className="flex items-center gap-2 text-xs text-gray-400 px-1">
+      <span>{THINKING_WORDS[wordIndex]}</span>
+      <span className="flex gap-0.5">
+        <span className="w-1 h-1 rounded-full bg-gray-400 animate-bounce" style={{ animationDelay: "0ms" }} />
+        <span className="w-1 h-1 rounded-full bg-gray-400 animate-bounce" style={{ animationDelay: "150ms" }} />
+        <span className="w-1 h-1 rounded-full bg-gray-400 animate-bounce" style={{ animationDelay: "300ms" }} />
+      </span>
+    </div>
+  );
+}
+
 export default function Chat() {
   const { id } = useParams();
   const [assistant, setAssistant] = useState(null);
@@ -83,6 +110,18 @@ export default function Chat() {
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
+
+  // Safety net for Android: closing the on-screen keyboard after a reply
+  // resizes the viewport a moment later, which can leave the scroll position
+  // looking "wrong" even though it was correct when it was set. Re-correct
+  // shortly after the reply finishes arriving.
+  useEffect(() => {
+    if (sending) return;
+    const timeout = setTimeout(() => {
+      bottomRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
+    }, 300);
+    return () => clearTimeout(timeout);
+  }, [sending]);
 
   const sendMessage = async (text) => {
     if (!text.trim() || sending) return;
@@ -191,7 +230,12 @@ export default function Chat() {
   };
 
   return (
-    <div className="h-screen flex flex-col">
+    // h-[100dvh] (dynamic viewport height) instead of h-screen (100vh) —
+    // on Android, 100vh doesn't account for the on-screen keyboard or the
+    // browser's address bar showing/hiding, which was causing the layout to
+    // jump and leave the chat scrolled to the wrong position after the
+    // keyboard closed. dvh updates live with the real visible area.
+    <div className="h-[100dvh] flex flex-col overflow-hidden">
       <Navbar />
       <div className="flex-1 overflow-y-auto max-w-2xl w-full mx-auto px-4 sm:px-6 py-6">
         <div className="flex items-start justify-between mb-1">
@@ -251,7 +295,7 @@ export default function Chat() {
               </div>
             </div>
           ))}
-          {sending && <p className="text-xs text-gray-400">Thinking...</p>}
+          {sending && <ThinkingIndicator />}
           {notice && <p className="text-xs text-brand-600">{notice}</p>}
         </div>
         <div ref={bottomRef} />
@@ -324,7 +368,7 @@ export default function Chat() {
                   ? "Add a caption or question about the image (optional)..."
                   : listening
                   ? "Listening..."
-                  : "Type a message... (try 'what's 235*17' or 'weather in Dhaka')"
+                  : "Type a message..."
               }
               className="flex-1 min-w-0 px-3 py-2 border border-gray-300 rounded-md text-sm"
             />
