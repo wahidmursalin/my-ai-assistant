@@ -2,11 +2,17 @@
 // - Pages (navigation): network first, fall back to the cached shell when offline.
 // - Same-origin static files (JS/CSS/icons): cache first, refreshed in the background.
 // - API calls (other origin, e.g. your Render backend) are NEVER cached.
-const CACHE = "custom-ai-v1";
-const SHELL = ["/", "/manifest.webmanifest", "/icons/icon-192.png", "/icons/icon-512.png"];
+//
+// v2: the cache name changed so any wrong files saved by v1 are deleted, and we
+// never store an HTML page as a static asset (a missing file on Vercel returns the
+// app's index.html with status 200, which must not be cached as an icon/JS/CSS).
+const CACHE = "custom-ai-v2";
+
+const isHtml = (res) => (res.headers.get("content-type") || "").includes("text/html");
 
 self.addEventListener("install", (event) => {
-  event.waitUntil(caches.open(CACHE).then((cache) => cache.addAll(SHELL)));
+  // Only pre-cache the app shell page itself.
+  event.waitUntil(caches.open(CACHE).then((cache) => cache.add("/")).catch(() => {}));
   self.skipWaiting();
 });
 
@@ -38,7 +44,7 @@ self.addEventListener("fetch", (event) => {
     caches.match(req).then((cached) => {
       const network = fetch(req)
         .then((res) => {
-          if (res.ok) {
+          if (res.ok && !isHtml(res)) {
             const copy = res.clone();
             caches.open(CACHE).then((cache) => cache.put(req, copy));
           }
