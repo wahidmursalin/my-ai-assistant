@@ -5,12 +5,12 @@ import AppLayout, { PageHeader } from "../components/AppLayout.jsx";
 import Icon from "../components/AuthIcons.jsx";
 
 const TYPE_COLORS = {
-  preference: "bg-blue-100 text-blue-700",
-  personal_info: "bg-violet-100 text-violet-700",
-  instruction: "bg-amber-100 text-amber-700",
-  interest: "bg-pink-100 text-pink-700",
-  project: "bg-green-100 text-green-700",
-  temporary: "bg-gray-100 text-gray-700",
+  preference: "bg-blue-100 text-blue-700 dark:bg-blue-400/15 dark:text-blue-300",
+  personal_info: "bg-violet-100 text-violet-700 dark:bg-violet-400/15 dark:text-violet-300",
+  instruction: "bg-amber-100 text-amber-700 dark:bg-amber-400/15 dark:text-amber-300",
+  interest: "bg-pink-100 text-pink-700 dark:bg-pink-400/15 dark:text-pink-300",
+  project: "bg-green-100 text-green-700 dark:bg-green-400/15 dark:text-green-300",
+  temporary: "bg-gray-100 text-gray-700 dark:bg-white/10 dark:text-gray-300",
 };
 
 export default function Memory() {
@@ -82,7 +82,7 @@ export default function Memory() {
               <button
                 onClick={() => handleDelete(m._id)}
                 aria-label="Delete memory"
-                className="w-8 h-8 shrink-0 rounded-lg bg-rose-50 text-rose-400 hover:bg-rose-100 hover:text-rose-500 flex items-center justify-center transition-colors"
+                className="w-8 h-8 shrink-0 rounded-lg bg-rose-50 text-rose-400 hover:bg-rose-100 hover:text-rose-500 dark:bg-rose-500/15 dark:text-rose-300 dark:hover:bg-rose-500/25 flex items-center justify-center transition-colors"
               >
                 <Icon name="trash" className="w-4 h-4" />
               </button>

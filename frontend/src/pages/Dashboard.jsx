@@ -6,10 +6,10 @@ import AppLayout, { Avatar } from "../components/AppLayout.jsx";
 import Icon from "../components/AuthIcons.jsx";
 
 const QUICK_ACTIONS = [
-  { icon: "bulb", label: "Explain", personality: "encouraging", desc: "Explains things simply", tone: "bg-amber-100 text-amber-600" },
-  { icon: "code", label: "Code", personality: "professional", desc: "Helps you write code", tone: "bg-orange-100 text-orange-600" },
-  { icon: "pen", label: "Write", personality: "friendly", desc: "Drafts and edits writing", tone: "bg-rose-100 text-rose-500" },
-  { icon: "book", label: "Learn", personality: "encouraging", desc: "Tutors you on a topic", tone: "bg-yellow-100 text-yellow-600" },
+  { icon: "bulb", label: "Explain", personality: "encouraging", desc: "Explains things simply", tone: "bg-amber-100 text-amber-600 dark:bg-amber-400/15 dark:text-amber-300" },
+  { icon: "code", label: "Code", personality: "professional", desc: "Helps you write code", tone: "bg-orange-100 text-orange-600 dark:bg-orange-500/15 dark:text-orange-300" },
+  { icon: "pen", label: "Write", personality: "friendly", desc: "Drafts and edits writing", tone: "bg-rose-100 text-rose-500 dark:bg-rose-400/15 dark:text-rose-300" },
+  { icon: "book", label: "Learn", personality: "encouraging", desc: "Tutors you on a topic", tone: "bg-yellow-100 text-yellow-600 dark:bg-yellow-400/15 dark:text-yellow-300" },
 ];
 
 const capitalize = (s) => (s ? s.charAt(0).toUpperCase() + s.slice(1) : s);
@@ -129,15 +129,15 @@ export default function Dashboard() {
                     onClick={() => handleDelete(a._id)}
                     title="Delete"
                     aria-label="Delete assistant"
-                    className="w-8 h-8 shrink-0 rounded-lg bg-rose-50 text-rose-400 hover:bg-rose-100 hover:text-rose-500 flex items-center justify-center transition-colors"
+                    className="w-8 h-8 shrink-0 rounded-lg bg-rose-50 text-rose-400 hover:bg-rose-100 hover:text-rose-500 dark:bg-rose-500/15 dark:text-rose-300 dark:hover:bg-rose-500/25 flex items-center justify-center transition-colors"
                   >
                     <Icon name="trash" className="w-4 h-4" />
                   </button>
                 </div>
 
                 <div className="flex flex-wrap gap-2 mt-3 text-xs">
-                  <span className="bg-orange-100 text-orange-700 px-2.5 py-1 rounded-full">{a.personality}</span>
-                  <span className="bg-amber-100 text-amber-700 px-2.5 py-1 rounded-full">{a.language}</span>
+                  <span className="bg-orange-100 text-orange-700 dark:bg-orange-500/15 dark:text-orange-300 px-2.5 py-1 rounded-full">{a.personality}</span>
+                  <span className="bg-amber-100 text-amber-700 dark:bg-amber-400/15 dark:text-amber-300 px-2.5 py-1 rounded-full">{a.language}</span>
                 </div>
 
                 <div className="flex flex-wrap items-center gap-1.5 mt-4">

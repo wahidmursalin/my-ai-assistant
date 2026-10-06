@@ -332,7 +332,7 @@ export default function Chat() {
               type="button"
               onClick={() => imageInputRef.current.click()}
               title="Attach an image"
-              className="shrink-0 px-2.5 sm:px-3 py-2 rounded-xl text-sm border bg-night-input border-night-border text-ink/60 hover:bg-orange-100 hover:text-orange-600 transition-colors"
+              className="shrink-0 px-2.5 sm:px-3 py-2 rounded-xl text-sm border bg-night-input border-night-border text-ink/60 hover:bg-orange-100 hover:text-orange-600 dark:hover:bg-orange-500/20 dark:hover:text-orange-300 transition-colors"
             >
               <Icon name="camera" className="w-4 h-4" />
             </button>
@@ -345,7 +345,7 @@ export default function Chat() {
                 className={`shrink-0 flex items-center justify-center px-2.5 sm:px-3 py-2 rounded-xl border transition-colors ${
                   listening
                     ? "bg-red-50 border-red-300 text-red-600"
-                    : "bg-night-input border-night-border text-ink/60 hover:bg-orange-100 hover:text-orange-600"
+                    : "bg-night-input border-night-border text-ink/60 hover:bg-orange-100 hover:text-orange-600 dark:hover:bg-orange-500/20 dark:hover:text-orange-300"
                 }`}
               >
                 {listening ? (

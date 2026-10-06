@@ -5,9 +5,9 @@ import AppLayout, { PageHeader } from "../components/AppLayout.jsx";
 import Icon from "../components/AuthIcons.jsx";
 
 const STATUS_STYLES = {
-  processing: "bg-amber-100 text-amber-700",
-  ready: "bg-green-100 text-green-700",
-  failed: "bg-red-100 text-red-700",
+  processing: "bg-amber-100 text-amber-700 dark:bg-amber-400/15 dark:text-amber-300",
+  ready: "bg-green-100 text-green-700 dark:bg-green-400/15 dark:text-green-300",
+  failed: "bg-red-100 text-red-700 dark:bg-red-400/15 dark:text-red-300",
 };
 
 export default function Knowledge() {
@@ -67,14 +67,14 @@ export default function Knowledge() {
 
         <label className="flex flex-col items-center border-2 border-dashed border-orange-300 bg-night-card/60 rounded-2xl p-8 text-center cursor-pointer hover:bg-orange-50 dark:hover:bg-white/5 hover:border-orange-400 transition-colors mb-4">
           <input ref={fileInput} type="file" accept="application/pdf" onChange={handleUpload} className="hidden" />
-          <span className="mb-2 w-11 h-11 rounded-xl bg-orange-100 text-orange-600 flex items-center justify-center">
+          <span className="mb-2 w-11 h-11 rounded-xl bg-orange-100 text-orange-600 dark:bg-orange-500/15 dark:text-orange-300 flex items-center justify-center">
             <Icon name="upload" className="w-5 h-5" />
           </span>
           <span className="text-sm font-medium text-ink/70">{uploading ? "Uploading..." : "Click to upload a PDF"}</span>
         </label>
 
         {error && (
-          <p className="text-sm text-rose-600 bg-rose-500/10 border border-rose-500/20 rounded-lg px-3 py-2 mb-4">{error}</p>
+          <p className="text-sm text-rose-600 dark:text-rose-300 bg-rose-500/10 border border-rose-500/20 rounded-lg px-3 py-2 mb-4">{error}</p>
         )}
 
         <div className="space-y-2">
@@ -92,7 +92,7 @@ export default function Knowledge() {
               <button
                 onClick={() => handleDelete(f._id)}
                 aria-label="Delete document"
-                className="w-8 h-8 shrink-0 rounded-lg bg-rose-50 text-rose-400 hover:bg-rose-100 hover:text-rose-500 flex items-center justify-center transition-colors"
+                className="w-8 h-8 shrink-0 rounded-lg bg-rose-50 text-rose-400 hover:bg-rose-100 hover:text-rose-500 dark:bg-rose-500/15 dark:text-rose-300 dark:hover:bg-rose-500/25 flex items-center justify-center transition-colors"
               >
                 <Icon name="trash" className="w-4 h-4" />
               </button>

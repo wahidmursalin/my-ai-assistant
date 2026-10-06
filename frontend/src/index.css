@@ -7,6 +7,15 @@
     @apply font-sans;
   }
 
+  /* Stop Chrome's autofill from painting inputs white/blue (breaks dark mode) */
+  input:-webkit-autofill,
+  input:-webkit-autofill:hover,
+  input:-webkit-autofill:focus {
+    -webkit-text-fill-color: rgb(var(--ink));
+    caret-color: rgb(var(--ink));
+    transition: background-color 9999s ease-out 0s;
+  }
+
   /* Light theme (default) - soft peach / light orange */
   :root {
     --night-bg: 255 244 232;
@@ -18,11 +27,11 @@
 
   /* Dark theme - warm dark */
   .dark {
-    --night-bg: 28 20 15;
-    --night-card: 43 31 24;
-    --night-border: 110 70 40;
-    --night-input: 56 41 31;
-    --ink: 255 247 237;
+    --night-bg: 22 19 17;
+    --night-card: 33 28 25;
+    --night-border: 64 52 44;
+    --night-input: 44 37 32;
+    --ink: 250 245 240;
   }
 }
 
@@ -37,6 +46,6 @@
     @apply inline-flex items-center justify-center gap-2 bg-gradient-to-r from-orange-400 to-orange-500 hover:brightness-105 disabled:opacity-60 text-white font-semibold rounded-xl px-4 py-2.5 text-sm shadow-md shadow-orange-500/20 transition;
   }
   .btn-soft {
-    @apply inline-flex items-center justify-center gap-1.5 bg-orange-100 text-orange-700 hover:bg-orange-200 font-medium rounded-lg px-3 py-1.5 text-sm transition-colors;
+    @apply inline-flex items-center justify-center gap-1.5 bg-orange-100 text-orange-700 hover:bg-orange-200 dark:bg-orange-500/15 dark:text-orange-300 dark:hover:bg-orange-500/25 font-medium rounded-lg px-3 py-1.5 text-sm transition-colors;
   }
 }

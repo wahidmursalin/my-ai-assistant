@@ -45,7 +45,7 @@ export default function CreateAssistant() {
       <div className="max-w-xl mx-auto px-4 sm:px-6 py-8">
         <PageHeader icon="sparkle" title="Create New Assistant" subtitle="Give your AI a name and a personality." />
         {error && (
-          <p className="text-sm text-rose-600 bg-rose-500/10 border border-rose-500/20 rounded-lg px-3 py-2 mb-4">{error}</p>
+          <p className="text-sm text-rose-600 dark:text-rose-300 bg-rose-500/10 border border-rose-500/20 rounded-lg px-3 py-2 mb-4">{error}</p>
         )}
         <form onSubmit={handleSubmit} className="card p-6 space-y-4">
           <div>

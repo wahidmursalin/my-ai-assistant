@@ -5,11 +5,12 @@ import { useAssistants } from "../context/AssistantsContext.jsx";
 import ThemeToggle from "./ThemeToggle.jsx";
 import CatMascot from "./CatMascot.jsx";
 import Icon from "./AuthIcons.jsx";
+import InstallButton from "./InstallButton.jsx";
 
 export function Avatar({ name, className = "w-8 h-8 text-sm" }) {
   return (
     <span
-      className={`inline-flex items-center justify-center rounded-full bg-orange-100 text-orange-600 font-bold shrink-0 ${className}`}
+      className={`inline-flex items-center justify-center rounded-full bg-orange-100 text-orange-600 dark:bg-orange-500/15 dark:text-orange-300 font-bold shrink-0 ${className}`}
     >
       {(name || "?").trim().charAt(0).toUpperCase()}
     </span>
@@ -40,7 +41,7 @@ export function PageHeader({ icon, title, subtitle }) {
       </button>
       <div className="flex items-center gap-3">
         {icon && (
-          <span className="w-10 h-10 rounded-xl bg-orange-100 text-orange-600 flex items-center justify-center">
+          <span className="w-10 h-10 rounded-xl bg-orange-100 text-orange-600 dark:bg-orange-500/15 dark:text-orange-300 flex items-center justify-center">
             <Icon name={icon} className="w-5 h-5" />
           </span>
         )}
@@ -107,7 +108,7 @@ export default function AppLayout({ children, scroll = true }) {
               onClick={() => setOpen(false)}
               className={`flex items-center gap-2.5 px-2.5 py-2 rounded-xl text-sm transition-colors ${
                 a._id === activeId
-                  ? "bg-orange-100 text-orange-700 font-semibold"
+                  ? "bg-orange-100 text-orange-700 dark:bg-orange-500/15 dark:text-orange-300 font-semibold"
                   : "text-ink/70 hover:bg-orange-50 dark:hover:bg-white/5"
               }`}
             >
@@ -119,6 +120,7 @@ export default function AppLayout({ children, scroll = true }) {
         </nav>
 
         <div className="p-3 border-t border-night-border space-y-3">
+          <InstallButton />
           <div className="flex items-center gap-2.5 px-1">
             <Avatar name={user?.name} className="w-9 h-9 text-sm" />
             <div className="min-w-0">
@@ -129,7 +131,7 @@ export default function AppLayout({ children, scroll = true }) {
           <div className="flex items-center gap-2">
             <button
               onClick={handleLogout}
-              className="flex-1 flex items-center justify-center gap-2 h-10 rounded-xl bg-rose-100 text-rose-600 hover:bg-rose-200 text-sm font-semibold transition-colors"
+              className="flex-1 flex items-center justify-center gap-2 h-10 rounded-xl bg-rose-100 text-rose-600 hover:bg-rose-200 dark:bg-rose-500/15 dark:text-rose-300 dark:hover:bg-rose-500/25 text-sm font-semibold transition-colors"
             >
               <Icon name="logout" className="w-4 h-4" /> Logout
             </button>
