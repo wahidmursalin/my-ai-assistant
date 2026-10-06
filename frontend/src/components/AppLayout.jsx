@@ -6,6 +6,7 @@ import ThemeToggle from "./ThemeToggle.jsx";
 import CatMascot from "./CatMascot.jsx";
 import Icon from "./AuthIcons.jsx";
 import InstallButton from "./InstallButton.jsx";
+import ReviewButton from "./ReviewButton.jsx";
 
 export function Avatar({ name, className = "w-8 h-8 text-sm" }) {
   return (
@@ -121,6 +122,12 @@ export default function AppLayout({ children, scroll = true }) {
 
         <div className="p-3 border-t border-night-border space-y-3">
           <InstallButton />
+          <ReviewButton />
+          {user?.isAdmin && (
+            <Link to="/admin/reviews" onClick={() => setOpen(false)} className="btn-soft w-full">
+              View all reviews
+            </Link>
+          )}
           <div className="flex items-center gap-2.5 px-1">
             <Avatar name={user?.name} className="w-9 h-9 text-sm" />
             <div className="min-w-0">

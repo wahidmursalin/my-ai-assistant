@@ -1,6 +1,7 @@
 import bcrypt from "bcryptjs";
 import User from "../models/User.js";
 import { generateToken } from "../utils/jwt.js";
+import { isAdminEmail } from "../middleware/admin.js";
 
 export const register = async (req, res) => {
   try {
@@ -21,7 +22,7 @@ export const register = async (req, res) => {
     const token = generateToken(user._id);
     res.status(201).json({
       token,
-      user: { id: user._id, name: user.name, email: user.email },
+      user: { id: user._id, name: user.name, email: user.email, isAdmin: isAdminEmail(user.email) },
     });
   } catch (err) {
     res.status(500).json({ message: err.message });
@@ -45,7 +46,7 @@ export const login = async (req, res) => {
     const token = generateToken(user._id);
     res.json({
       token,
-      user: { id: user._id, name: user.name, email: user.email },
+      user: { id: user._id, name: user.name, email: user.email, isAdmin: isAdminEmail(user.email) },
     });
   } catch (err) {
     res.status(500).json({ message: err.message });
@@ -55,7 +56,7 @@ export const login = async (req, res) => {
 export const getMe = async (req, res) => {
   try {
     const user = await User.findById(req.userId).select("-password");
-    res.json(user);
+    res.json({ ...user.toObject(), isAdmin: isAdminEmail(user.email) });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }

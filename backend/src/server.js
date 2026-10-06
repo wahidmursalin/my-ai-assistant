@@ -12,6 +12,7 @@ import assistantRoutes from "./routes/assistantRoutes.js";
 import memoryRoutes from "./routes/memoryRoutes.js";
 import chatRoutes from "./routes/chatRoutes.js";
 import knowledgeRoutes from "./routes/knowledgeRoutes.js";
+import reviewRoutes from "./routes/reviewRoutes.js";
 
 const app = express();
 
@@ -30,6 +31,7 @@ app.use("/api/assistants", assistantRoutes);
 app.use("/api/memories", memoryRoutes);
 app.use("/api/chat", chatRoutes);
 app.use("/api/knowledge", knowledgeRoutes);
+app.use("/api/reviews", reviewRoutes);
 
 const PORT = process.env.PORT || 5000;
 

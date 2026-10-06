@@ -7,6 +7,7 @@ import Chat from "./pages/Chat.jsx";
 import TeachAssistant from "./pages/TeachAssistant.jsx";
 import Memory from "./pages/Memory.jsx";
 import Knowledge from "./pages/Knowledge.jsx";
+import AdminReviews from "./pages/AdminReviews.jsx";
 import PrivateRoute from "./components/PrivateRoute.jsx";
 
 export default function App() {
@@ -21,6 +22,8 @@ export default function App() {
       <Route path="/assistants/:id/teach" element={<PrivateRoute><TeachAssistant /></PrivateRoute>} />
       <Route path="/assistants/:id/memory" element={<PrivateRoute><Memory /></PrivateRoute>} />
       <Route path="/assistants/:id/knowledge" element={<PrivateRoute><Knowledge /></PrivateRoute>} />
+
+      <Route path="/admin/reviews" element={<PrivateRoute><AdminReviews /></PrivateRoute>} />
 
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
